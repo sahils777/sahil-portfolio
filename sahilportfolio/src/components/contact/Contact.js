@@ -26,15 +26,11 @@ const Contact = () => {
 
     setErrMsg("");
 
-    const slackMessage = {
-      text: `📩 *New Contact Form Submission* 📩\n\n*Name:* ${username}\n*Email:* ${email}\n*Message:* ${message}`,
-    };
-
     try {
-      const response = await fetch("https://sahilportfolio-lyart.vercel.app/api/send-to-slack", {
+      const response = await fetch("http://sahilportfolio-lyart.vercel.app/send-to-slack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(slackMessage),
+        body: JSON.stringify({ username, email, message }),
       });
 
       if (!response.ok) {
