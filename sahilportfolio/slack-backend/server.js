@@ -6,7 +6,27 @@ const axios = require("axios");
 const app = express();
 
 // Enable CORS for all routes
-app.use(cors());
+const allowedOrigins = ["https://sahilportfolio-lyart.vercel.app", "http://localhost:3000"];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+
+// Handle preflight requests
+app.options("/send-to-slack", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.send();
+});
 
 // Parse JSON request bodies
 app.use(express.json());
@@ -33,7 +53,6 @@ app.post("/send-to-slack", async (req, res) => {
     };
 
     console.log("Sending to Slack:", slackMessage);
-    console.log("Slack Webhook URL:", process.env.SLACK_WEBHOOK_URL);
 
     const response = await axios.post(SLACK_WEBHOOK_URL, slackMessage);
 
