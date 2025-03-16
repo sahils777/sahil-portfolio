@@ -1,0 +1,57 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Background Styles */
+body {
+  background: linear-gradient(to right, #1e1e1e, #121212, #1e1e1e);
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Responsive Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Make sections responsive */
+@media (max-width: 1024px) {
+  .container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .App-header {
+    font-size: calc(8px + 2vmin);
+  }
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Navbar Responsive Fix */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+@media (max-width: 360px) {
+  .navbar {
+    flex-direction: column;
+    text-align: center;
+  }
+}
