@@ -16,47 +16,50 @@ const Contact = () => {
       .match(/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/);
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
+      const API_URL =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5000" // Local backend
+        : "https://your-vercel-backend-url.vercel.app"; // Replace with your deployed backend URL
 
-    if (!username || !email || !message || !emailValidation) {
-      setErrMsg("All fields are required!");
-      return;
-    }
+    const handleSend = async (e) => {
+      e.preventDefault();
 
-    setErrMsg("");
-
-    const emailData = { username, email, message };
-
-    try {
-      const response = await fetch("/api/send-email", { // No need for full URL
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(emailData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!username || !email || !message || !emailValidation(email)) {
+        setErrMsg("All fields are required!");
+        return;
       }
 
-      const data = await response.json();
-      console.log("Email API Response:", data);
+      setErrMsg("");
 
-      if (response.ok) {
-        setSuccessMsg(`Thank you ${username}, your message has been sent!`);
-        setUsername("");
-        setEmail("");
-        setMessage("");
-      } else {
-        setErrMsg("Failed to send email.");
+      const emailData = { username, email, message };
+
+      try {
+        const response = await fetch(`${API_URL}/api/send-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(emailData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Email API Response:", data);
+
+        if (response.ok) {
+          setSuccessMsg(`Thank you ${username}, your message has been sent!`);
+          setUsername("");
+          setEmail("");
+          setMessage("");
+        } else {
+          setErrMsg("Failed to send email.");
+        }
+      } catch (error) {
+        console.error("Network Error:", error);
+        setErrMsg("Something went wrong. Check your backend and try again.");
       }
-    } catch (error) {
-      console.error("Network Error:", error);
-      setErrMsg("Something went wrong. Check your backend and try again.");
-    }
-  };
-
-
+    };
 
   return (
     <section id="contact" className="w-full py-20 border-b-[1px] border-b-black">

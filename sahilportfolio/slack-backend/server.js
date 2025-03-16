@@ -2,13 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-
+console.log("Email User:", process.env.EMAIL_USER);
+console.log("Email Pass:", process.env.EMAIL_PASS);
 const app = express();
 
 // ✅ Allow CORS for frontend requests
 const allowedOrigins = [
-  "http://localhost:3000", // For local testing
-  "https://sahilportfolio-lyart.vercel.app" // Your deployed frontend URL
+  "http://localhost:3000", // Local development
+  "https://your-vercel-frontend-url.vercel.app" // Replace with your deployed frontend URL
 ];
 
 app.use(cors({
