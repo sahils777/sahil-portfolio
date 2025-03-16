@@ -31,11 +31,15 @@ const Contact = () => {
     };
 
     try {
-      const response = await fetch("https://sahilportfolio-lyart.vercel.app/send-to-slack", {
+      const response = await fetch("https://sahilportfolio-lyart.vercel.app/api/send-to-slack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(slackMessage),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
       const data = await response.json();
       console.log("Slack API Response:", data);
@@ -53,7 +57,6 @@ const Contact = () => {
       setErrMsg("Something went wrong. Check your backend and try again.");
     }
   };
-
 
 
   return (
