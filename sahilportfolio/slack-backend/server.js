@@ -2,37 +2,39 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-console.log("Email User:", process.env.EMAIL_USER);
-console.log("Email Pass:", process.env.EMAIL_PASS);
+
 const app = express();
 
-// ✅ Allow CORS for frontend requests
+// ✅ Allow requests from your frontend URL
 const allowedOrigins = [
-  "http://localhost:3000", // Local development
-  "https://your-vercel-frontend-url.vercel.app" // Replace with your deployed frontend URL
+  "https://sahilportfolio-lyart.vercel.app", // 🚀 Your deployed frontend URL
+  "http://localhost:3000" // ✅ Allow localhost for development
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
+  })
+);
 
-app.use(express.json());
-
-// ✅ Handle preflight (OPTIONS) requests
+// ✅ Handle preflight requests
 app.options("/api/send-email", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   res.send();
 });
+
+// ✅ Middleware to parse JSON
+app.use(express.json());
 
 // ✅ Email Sending Route
 app.post("/api/send-email", async (req, res) => {
@@ -42,9 +44,8 @@ app.post("/api/send-email", async (req, res) => {
     return res.status(400).json({ success: false, error: "All fields are required!" });
   }
 
-  // ✅ Configure Nodemailer Transporter
   let transporter = nodemailer.createTransport({
-    service: "gmail", // You can use Gmail, Outlook, Yahoo, etc.
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USER, // Your email
       pass: process.env.EMAIL_PASS  // Your email app password
@@ -67,5 +68,6 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
