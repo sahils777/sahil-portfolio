@@ -19,20 +19,8 @@ const Contact = () => {
   const handleSend = async (e) => {
     e.preventDefault();
 
-    if (!username) {
-      setErrMsg("Username is required!");
-      return;
-    }
-    if (!email) {
-      setErrMsg("Please provide your Email!");
-      return;
-    }
-    if (!emailValidation(email)) {
-      setErrMsg("Provide a valid Email!");
-      return;
-    }
-    if (!message) {
-      setErrMsg("Message is required!");
+    if (!username || !email || !message || !emailValidation) {
+      setErrMsg("All fields are required!");
       return;
     }
 
@@ -43,11 +31,14 @@ const Contact = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/send-to-slack", { // Calls the backend API
+      const response = await fetch("https://sahilportfolio-lyart.vercel.app/send-to-slack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(slackMessage),
       });
+
+      const data = await response.json();
+      console.log("Slack API Response:", data);
 
       if (response.ok) {
         setSuccessMsg(`Thank you ${username}, your message has been sent to Slack!`);
@@ -55,15 +46,14 @@ const Contact = () => {
         setEmail("");
         setMessage("");
       } else {
-        const errorText = await response.text();
-        console.error("Backend Error:", errorText);
-        setErrMsg(`Failed to send message: ${errorText}`);
+        setErrMsg("Failed to send message.");
       }
     } catch (error) {
       console.error("Network Error:", error);
       setErrMsg("Something went wrong. Check your backend and try again.");
     }
   };
+
 
 
   return (

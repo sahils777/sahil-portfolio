@@ -4,12 +4,19 @@ const cors = require("cors");
 const axios = require("axios");
 
 const app = express();
-app.use(cors());
+
+// 🔥 Allow requests only from your deployed frontend URL
+app.use(cors({
+  origin: "https://sahilportfolio.vercel.app", // Change this to your frontend domain
+  methods: "POST",
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
 
-// Load Slack Webhook URL from environment variables
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
+// 📩 Slack API Route
 app.post("/send-to-slack", async (req, res) => {
   try {
     const response = await axios.post(SLACK_WEBHOOK_URL, req.body);
@@ -21,4 +28,4 @@ app.post("/send-to-slack", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
