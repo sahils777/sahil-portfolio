@@ -1,7 +1,19 @@
 {
+    "version": 2,
     "build": {
       "env": {
         "NODE_VERSION": "18"
       }
-    }
+    },
+    "routes": [
+      {
+        "src": "/send-to-slack",
+        "methods": ["POST", "OPTIONS"],
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      }
+    ]
   }
