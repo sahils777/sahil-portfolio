@@ -19,7 +19,7 @@ const Contact = () => {
   const handleSend = async (e) => {
     e.preventDefault();
 
-    if (!username || !email || !message || !emailValidation) {
+    if (!username || !email || !message || !emailValidation()) {
       setErrMsg("All fields are required!");
       return;
     }

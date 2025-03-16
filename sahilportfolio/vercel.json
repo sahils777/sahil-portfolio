@@ -7,7 +7,7 @@
     },
     "routes": [
       {
-        "src": "/send-to-slack",
+        "src": "/api/send-to-slack",
         "methods": ["POST", "OPTIONS"],
         "headers": {
           "Access-Control-Allow-Origin": "*",

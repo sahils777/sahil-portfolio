@@ -16,14 +16,14 @@ app.use(cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["POST"],
+  methods: ["POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
 
 // Handle preflight requests
-app.options("/send-to-slack", (req, res) => {
+app.options("/api/send-to-slack", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "POST");
+  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   res.send();
 });
