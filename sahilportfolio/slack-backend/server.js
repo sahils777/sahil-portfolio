@@ -1,12 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const axios = require("axios");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
-// Enable CORS for all routes
-const allowedOrigins = ["https://sahilportfolio-lyart.vercel.app", "http://localhost:3000"];
+// ✅ Allow CORS for frontend requests
+const allowedOrigins = [
+  "http://localhost:3000", // For local testing
+  "https://sahilportfolio-lyart.vercel.app" // Your deployed frontend URL
+];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -20,53 +23,48 @@ app.use(cors({
   allowedHeaders: ["Content-Type"]
 }));
 
-// Handle preflight requests
-app.options("/send-to-slack", (req, res) => {
+app.use(express.json());
+
+// ✅ Handle preflight (OPTIONS) requests
+app.options("/api/send-email", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   res.send();
 });
 
-// Parse JSON request bodies
-app.use(express.json());
+// ✅ Email Sending Route
+app.post("/api/send-email", async (req, res) => {
+  const { username, email, message } = req.body;
 
-// Slack Webhook URL (from Step 1)
-const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
+  if (!username || !email || !message) {
+    return res.status(400).json({ success: false, error: "All fields are required!" });
+  }
 
-// Route to handle Slack messages
-app.post("/send-to-slack", async (req, res) => {
-  try {
-    const { username, email, message } = req.body;
-
-    // Validate input
-    if (!username || !email || !message) {
-      return res.status(400).json({ success: false, error: "All fields are required!" });
+  // ✅ Configure Nodemailer Transporter
+  let transporter = nodemailer.createTransport({
+    service: "gmail", // You can use Gmail, Outlook, Yahoo, etc.
+    auth: {
+      user: process.env.EMAIL_USER, // Your email
+      pass: process.env.EMAIL_PASS  // Your email app password
     }
+  });
 
-    // Log the incoming request
-    console.log("Received request:", { username, email, message });
+  let mailOptions = {
+    from: email,
+    to: process.env.EMAIL_USER, // Your email (receiver)
+    subject: `New Contact Form Submission from ${username}`,
+    text: `Name: ${username}\nEmail: ${email}\n\nMessage:\n${message}`
+  };
 
-    // Send message to Slack
-    const slackMessage = {
-      text: `📩 *New Contact Form Submission* 📩\n\n*Name:* ${username}\n*Email:* ${email}\n*Message:* ${message}`,
-    };
-
-    console.log("Sending to Slack:", slackMessage);
-
-    const response = await axios.post(SLACK_WEBHOOK_URL, slackMessage);
-
-    // Log the Slack API response
-    console.log("Slack API Response:", response.data);
-
-    // Respond to the client
-    res.status(200).json({ success: true, message: "Message sent to Slack!" });
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: "Email sent successfully!" });
   } catch (error) {
-    console.error("Error sending to Slack:", error.response ? error.response.data : error);
-    res.status(500).json({ success: false, error: error.response ? error.response.data : error.message });
+    console.error("Error sending email:", error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
